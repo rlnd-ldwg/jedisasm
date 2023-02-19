@@ -1,5 +1,6 @@
 """
 JEDEC disassembler for "classic" PAL and GAL devices.
+https://github.com/dev-zzo/jedisasm
 """
 
 import os.path
@@ -39,7 +40,7 @@ def load_jedec(fp):
     num_fuses = None
     default = 0
     for cmd in jedec_commands(fp):
-        #print(cmd)
+#        print(cmd)
         if cmd.startswith("QF"):
             num_fuses = int(cmd[2:], 10)
         elif cmd.startswith("F"):
@@ -47,17 +48,23 @@ def load_jedec(fp):
         elif cmd.startswith("L"):
             fuse_list.append(cmd[1:])
     fusemap = [default for _ in range(num_fuses)]
+ #   print(fuse_list)
     for c in fuse_list:
-        pos, data = c.split(maxsplit=1)
+#        print("->", c)
+        #pos, data = c.split(maxsplit=1)
+        pos, data = c.split(' ',1)
+ #       print(pos, data)
         data = data.replace(" ", "")
         pos = int(pos, 10)
         for fuse, state in zip(range(pos, pos+len(data)), data):
             fusemap[fuse] = int(state)
+#            print("Fuse->", fuse, state)
     return fusemap
 
 def read_jedec(path):
     with open(path, "r") as fp:
         return load_jedec(fp)
+#    print("read_jedec")
 
 # Helper stuff
 
